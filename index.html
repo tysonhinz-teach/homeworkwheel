@@ -32,7 +32,6 @@
         }
     </script>
     <style>
-        /* Light grid paper background pattern */
         .whiteboard-bg {
             background-color: #f1f5f9;
             background-image: 
@@ -41,13 +40,11 @@
             background-size: 24px 24px;
         }
 
-        /* Triangle pointer indicator animation */
         .pointer-tick {
             transform-origin: top center;
             transition: transform 0.05s ease-out;
         }
 
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -66,7 +63,6 @@
     <header class="border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm px-4 py-3 relative z-10">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             
-            <!-- Header Title -->
             <div class="flex items-center gap-3 text-center sm:text-left">
                 <div class="p-2.5 bg-blue-50 rounded-xl border border-blue-200 text-blue-600">
                     <i data-lucide="check-square" class="w-7 h-7"></i>
@@ -82,21 +78,18 @@
                 </div>
             </div>
 
-            <!-- Header Controls -->
             <div class="flex items-center gap-2">
-                <!-- Cloud Connection Diagnostic Badge -->
-                <div id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold" title="Cloud Sync Status">
-                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
-                    <span id="cloudStatusText">Local Mode</span>
+                <!-- Status Badge -->
+                <div id="cloudStatusBadge" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold" title="Connecting...">
+                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    <span id="cloudStatusText">Connecting...</span>
                 </div>
 
-                <!-- Sound Toggle Button -->
                 <button id="soundToggleBtn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold transition">
                     <i id="soundIcon" data-lucide="volume-2" class="w-4 h-4 text-blue-600"></i>
                     <span id="soundText">Sound ON</span>
                 </button>
 
-                <!-- Reset Statistics Button -->
                 <button id="resetStatsBtn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold transition">
                     <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
                     <span>Reset Data</span>
@@ -108,13 +101,8 @@
     <!-- MAIN WORKSPACE -->
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         
-        <!-- WHEEL PANEL (7 Cols) -->
         <section class="lg:col-span-7 flex flex-col items-center justify-center bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm relative overflow-hidden">
-            
-            <!-- WHEEL CONTAINER -->
             <div class="relative my-2 flex items-center justify-center select-none">
-                
-                <!-- Pointer Arrow (Top Indicator) -->
                 <div id="pointer" class="absolute -top-5 z-20 pointer-tick filter drop-shadow-md">
                     <svg width="44" height="52" viewBox="0 0 46 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M23 54L3.08333 19.5L42.9167 19.5L23 54Z" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
@@ -123,28 +111,22 @@
                     </svg>
                 </div>
 
-                <!-- Canvas Wheel -->
                 <div class="p-3 bg-slate-100 rounded-full border border-slate-200 shadow-inner relative">
                     <canvas id="wheelCanvas" width="440" height="440" class="max-w-full h-auto cursor-pointer rounded-full transition-transform duration-300 hover:scale-[1.01]"></canvas>
                 </div>
 
-                <!-- Center Cap Decorator -->
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full border-4 border-slate-200 shadow-md flex items-center justify-center pointer-events-none z-10">
                     <i data-lucide="calculator" class="w-7 h-7 text-blue-600"></i>
                 </div>
             </div>
 
-            <!-- SPIN CONTROLS & SPEED -->
             <div class="w-full max-w-md mt-6 flex flex-col items-center gap-4 z-10">
-                
-                <!-- Big Spin Button -->
                 <button id="spinBtn" class="w-full py-4 px-8 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold text-xl rounded-2xl shadow-lg shadow-blue-500/20 border border-blue-400/30 flex items-center justify-center gap-3 transition-all">
                     <i data-lucide="rotate-cw" class="w-6 h-6"></i>
                     <span>SPIN THE WHEEL</span>
                     <span class="text-xs bg-black/15 px-2 py-1 rounded font-code text-blue-100 hidden sm:inline">Spacebar</span>
                 </button>
 
-                <!-- Spin Intensity selector -->
                 <div class="flex items-center justify-between w-full px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
                     <span class="font-semibold flex items-center gap-1.5">
                         <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> Spin Speed:
@@ -156,12 +138,9 @@
                     </div>
                 </div>
             </div>
-
         </section>
 
-        <!-- PROBABILITY STATS PANEL (5 Cols) -->
         <section class="lg:col-span-5 flex flex-col gap-6">
-            
             <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
                     <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -171,7 +150,6 @@
                     <span class="text-[10px] font-code bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">Grade 9 Tracker</span>
                 </div>
 
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-2 gap-3 mb-5">
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
                         <span class="text-xs text-slate-500 font-medium block mb-1">Total Spins</span>
@@ -183,9 +161,7 @@
                     </div>
                 </div>
 
-                <!-- Comparison Progress Bars -->
                 <div class="space-y-4 text-xs font-medium mb-5">
-                    <!-- Theoretical -->
                     <div>
                         <div class="flex justify-between mb-1.5 text-slate-600">
                             <span>Theoretical Probability P(Check)</span>
@@ -196,7 +172,6 @@
                         </div>
                     </div>
 
-                    <!-- Experimental -->
                     <div>
                         <div class="flex justify-between mb-1.5 text-slate-600">
                             <span>Experimental Probability</span>
@@ -208,7 +183,6 @@
                     </div>
                 </div>
 
-                <!-- Grade 9 Math Explanation Note -->
                 <div class="p-4 bg-blue-50/70 rounded-2xl border border-blue-100 text-xs text-slate-700 leading-relaxed">
                     <p class="font-bold text-blue-900 mb-1 flex items-center gap-1.5">
                         <i data-lucide="lightbulb" class="w-4 h-4 text-blue-600"></i>
@@ -219,12 +193,10 @@
                     </p>
                 </div>
             </div>
-
         </section>
 
     </main>
 
-    <!-- FOOTER -->
     <footer class="border-t border-slate-200 bg-white py-3 text-center text-xs text-slate-500 font-medium">
         Mr. Hinz's Math Classroom • Grade 9 Probability Activity
     </footer>
@@ -232,35 +204,39 @@
     <!-- RESULT MODAL OVERLAY -->
     <div id="resultModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
         <div id="resultCard" class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl text-center transform scale-90 transition-transform duration-300 relative overflow-hidden">
-            
             <div id="modalIconContainer" class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 border shadow-sm">
                 <i id="modalIcon" data-lucide="shield-check" class="w-10 h-10"></i>
             </div>
-
             <h3 id="modalTitle" class="text-3xl font-extrabold mb-2 tracking-tight text-slate-900">SAFE!</h3>
-
             <p id="modalDescription" class="text-slate-600 text-sm mb-6 leading-relaxed">
                 You passed the spin! No homework check right now.
             </p>
-
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-code text-slate-600 mb-6">
                 Outcome: <span id="modalOutcomeBadge" class="font-bold text-slate-900">Safe (4 in 5 Chance)</span>
             </div>
-
             <button id="closeModalBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition shadow-lg shadow-blue-500/20 text-sm">
                 Continue Lesson
             </button>
         </div>
     </div>
 
-
     <!-- JAVASCRIPT GAME & INTERACTION LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- APPLICATION STATE ---
+        // APP CONFIGURATION
+        const customFirebaseConfig = {
+            apiKey: "AIzaSyDHmL6x6Rg62D8_4yFm59VYKQm_XBk5ifo",
+            authDomain: "wheel-2-b5643.firebaseapp.com",
+            databaseURL: "https://wheel-2-b5643-default-rtdb.firebaseio.com",
+            projectId: "wheel-2-b5643",
+            storageBucket: "wheel-2-b5643.firebasestorage.app",
+            messagingSenderId: "425047161672",
+            appId: "1:425047161672:web:22841d98d442d6a521d17d"
+        };
+
         const sectors = [
             { id: 1, label: "Homework Check!", isCheck: true, color: "#ef4444", textColor: "#ffffff" },
             { id: 2, label: "Safe", isCheck: false, color: "#10b981", textColor: "#ffffff" },
@@ -269,34 +245,18 @@
             { id: 5, label: "Safe", isCheck: false, color: "#f59e0b", textColor: "#ffffff" }
         ];
 
-        let currentAngle = 0; // Radians
+        let currentAngle = 0;
         let angularVelocity = 0;
         let isSpinning = false;
-        let spinSpeedMode = "normal"; // slow, normal, fast
+        let spinSpeedMode = "normal";
         let soundEnabled = true;
 
-        // Statistics
-        let totalSpins = 0;
-        let checkedCount = 0;
+        // Statistics (Local Cache initialized from localStorage)
+        let totalSpins = parseInt(localStorage.getItem('hinz_totalSpins') || '0', 10);
+        let checkedCount = parseInt(localStorage.getItem('hinz_checkedCount') || '0', 10);
 
-        // =========================================================================
-        // FIREBASE SETUP FOR GITHUB PAGES:
-        // Paste your Firebase Config object below to save data permanently on GitHub Pages!
-        // =========================================================================
-        const customFirebaseConfig = {
-  apiKey: "AIzaSyDHmL6x6Rg62D8_4yFm59VYKQm_XBk5ifo",
-  authDomain: "wheel-2-b5643.firebaseapp.com",
-  projectId: "wheel-2-b5643",
-  storageBucket: "wheel-2-b5643.firebasestorage.app",
-  messagingSenderId: "425047161672",
-  appId: "1:425047161672:web:22841d98d442d6a521d17d"
-};
-
-        // Cloud Data Persistence Configuration
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hinz-homework-wheel';
         let db = null;
         let auth = null;
-        let currentUser = null;
         let statsDocRef = null;
 
         function updateCloudStatus(status, message = '') {
@@ -305,96 +265,77 @@
             const text = document.getElementById('cloudStatusText');
             if (!badge || !dot || !text) return;
 
-            badge.classList.remove('hidden');
-
             if (status === 'connected') {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
                 text.textContent = "Cloud Saved";
                 badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold";
-                badge.title = "Connected to Firebase! Data is automatically saved across all devices.";
+                badge.title = "Connected to Firebase! Data syncs across devices.";
                 badge.onclick = null;
             } else if (status === 'error') {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
                 text.textContent = "Cloud Error";
                 badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200 text-xs font-bold cursor-pointer hover:bg-red-100 transition";
-                badge.title = "Click to see Firebase error details";
-                badge.onclick = () => alert("Firebase Connection Error:\n\n" + (message || "Failed to sync with Firebase. Please check your configuration."));
+                badge.title = "Click to view setup issue";
+                badge.onclick = () => alert("Firebase Configuration Error:\n\n" + message);
             } else {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                text.textContent = "Local Only";
-                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold";
-                badge.title = "Spins reset on refresh. Paste Firebase config in index.html to enable cross-device persistence.";
+                text.textContent = "Saved Locally";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold";
+                badge.title = "Data saved in browser storage.";
                 badge.onclick = null;
             }
         }
 
         async function initCloudStorage() {
-            let firebaseConfig = null;
-            
-            // Priority 1: Custom config defined directly in the file (for GitHub Pages)
-            if (typeof customFirebaseConfig !== 'undefined' && customFirebaseConfig) {
-                firebaseConfig = customFirebaseConfig;
-            } 
-            // Priority 2: Built-in environment config
-            else if (typeof __firebase_config !== 'undefined') {
-                try {
-                    firebaseConfig = JSON.parse(__firebase_config);
-                } catch(e) {}
-            }
-
-            if (!firebaseConfig) {
+            if (!customFirebaseConfig || !customFirebaseConfig.apiKey) {
                 updateCloudStatus('local');
                 return;
             }
 
             try {
-                const app = initializeApp(firebaseConfig);
+                const app = initializeApp(customFirebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Authenticate before querying database
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (authErr) {
-                        if (authErr.code === 'auth/operation-not-allowed') {
-                            updateCloudStatus('error', 'Anonymous Auth is turned OFF in Firebase!\n\nFix: Go to Firebase Console -> Authentication -> Sign-in method -> Click "Anonymous" -> Turn ON toggle -> Save.');
-                            return;
-                        } else {
-                            throw authErr;
-                        }
+                try {
+                    await signInAnonymously(auth);
+                } catch (authErr) {
+                    if (authErr.code === 'auth/configuration-not-found' || authErr.code === 'auth/operation-not-allowed') {
+                        updateCloudStatus('error', 'Anonymous Auth is OFF in Firebase console wheel-2-b5643!\n\nFix: Go to Firebase Console -> Authentication -> Sign-in method -> Click "Anonymous" -> Turn ON -> Save.');
+                        return;
                     }
+                    throw authErr;
                 }
-                currentUser = auth.currentUser;
 
-                if (!currentUser) return;
+                statsDocRef = doc(db, 'wheel_data', 'hinz_homework_stats');
 
-                // Path rule: /artifacts/{appId}/public/data/{collectionName}
-                statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'spinData');
-
-                // Real-time synchronization
                 onSnapshot(statsDocRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.data();
                         totalSpins = data.totalSpins || 0;
                         checkedCount = data.checkedCount || 0;
+                        localStorage.setItem('hinz_totalSpins', totalSpins);
+                        localStorage.setItem('hinz_checkedCount', checkedCount);
                         updateStatsUI();
+                    } else {
+                        saveStatsToCloud();
                     }
                     updateCloudStatus('connected');
                 }, (err) => {
-                    console.warn("Cloud sync listener warning:", err);
-                    updateCloudStatus('error', 'Firestore Permission Error!\n\nFix: In Firebase Console -> Firestore Database -> Rules tab, ensure your rules allow read and write access.');
+                    console.warn("Firestore snapshot listener error:", err);
+                    updateCloudStatus('error', 'Firestore permission error!\n\nFix: In Firebase Console -> Firestore Database -> Rules tab, change rules to allow read/write.');
                 });
             } catch (err) {
-                console.warn("Cloud persistence setup warning:", err);
-                updateCloudStatus('error', err.message || 'Firebase failed to initialize. Make sure you pasted the exact config object.');
+                console.warn("Cloud initialization error:", err);
+                updateCloudStatus('error', err.message || 'Firebase failed to connect.');
             }
         }
 
         async function saveStatsToCloud() {
-            if (!db || !currentUser || !statsDocRef) return;
+            localStorage.setItem('hinz_totalSpins', totalSpins);
+            localStorage.setItem('hinz_checkedCount', checkedCount);
+
+            if (!db || !statsDocRef) return;
             try {
                 await setDoc(statsDocRef, {
                     totalSpins: totalSpins,
@@ -402,13 +343,12 @@
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
             } catch (err) {
-                console.error("Error saving spin stats:", err);
+                console.error("Error saving data to Firebase:", err);
             }
         }
 
-        // Sound Audio Context (Web Audio API)
+        // Web Audio API Tones
         let audioCtx = null;
-
         function initAudio() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -419,36 +359,30 @@
             }
         }
 
-        // Play procedural tick sound for wheel rotation
         function playTickSound() {
             if (!soundEnabled) return;
             try {
                 initAudio();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(600 + Math.random() * 200, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
-                
                 gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
-                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.04);
             } catch (e) {}
         }
 
-        // Play Win Fanfare
         function playSafeSound() {
             if (!soundEnabled) return;
             try {
                 initAudio();
                 const now = audioCtx.currentTime;
-                const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                const freqs = [523.25, 659.25, 783.99, 1046.50];
                 freqs.forEach((f, i) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
@@ -464,7 +398,6 @@
             } catch (e) {}
         }
 
-        // Play Homework Check Alert Tone
         function playCheckSound() {
             if (!soundEnabled) return;
             try {
@@ -472,23 +405,19 @@
                 const now = audioCtx.currentTime;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(260, now);
                 osc.frequency.linearRampToValueAtTime(130, now + 0.5);
-                
                 gain.gain.setValueAtTime(0.25, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
-                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                
                 osc.start(now);
                 osc.stop(now + 0.55);
             } catch (e) {}
         }
 
-        // --- CANVAS WHEEL RENDERING ---
+        // Canvas Wheel Drawing
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const numSectors = sectors.length;
@@ -503,7 +432,6 @@
 
             ctx.clearRect(0, 0, width, height);
 
-            // Draw outer border rim
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius + 8, 0, 2 * Math.PI);
             ctx.fillStyle = '#f1f5f9';
@@ -512,27 +440,22 @@
             ctx.strokeStyle = '#cbd5e1';
             ctx.stroke();
 
-            // Draw sectors
             for (let i = 0; i < numSectors; i++) {
                 const sectorAngle = currentAngle + i * arc;
                 const sector = sectors[i];
 
-                // Slice wedge
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, sectorAngle, sectorAngle + arc);
                 ctx.closePath();
 
-                // Fill color
                 ctx.fillStyle = sector.color;
                 ctx.fill();
 
-                // Slice border line
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
 
-                // TEXT AND GRAPHICS INSIDE SLICE
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(sectorAngle + arc / 2);
@@ -540,7 +463,6 @@
                 ctx.textBaseline = "middle";
                 ctx.fillStyle = sector.textColor;
 
-                // Main Sector Label
                 if (sector.isCheck) {
                     ctx.font = "bold 16px 'Plus Jakarta Sans', sans-serif";
                     ctx.fillText("🚨 " + sector.label, radius - 22, 0);
@@ -552,7 +474,6 @@
                 ctx.restore();
             }
 
-            // Draw Pegs/Pins on outer edge
             for (let i = 0; i < numSectors; i++) {
                 const pegAngle = currentAngle + i * arc;
                 const pegX = centerX + (radius - 4) * Math.cos(pegAngle);
@@ -568,15 +489,12 @@
             }
         }
 
-        // --- PHYSICS & ANIMATION LOOP ---
         let lastPegIndex = -1;
 
         function animateWheel() {
             if (isSpinning) {
-                // Apply reduced friction deceleration (0.9912 extends spin duration by ~3 seconds)
                 angularVelocity *= 0.9912;
 
-                // Stop condition
                 if (angularVelocity < 0.001) {
                     angularVelocity = 0;
                     isSpinning = false;
@@ -586,7 +504,6 @@
                 currentAngle += angularVelocity;
                 currentAngle %= (2 * Math.PI);
 
-                // Check for peg collision with top pointer (Pointer is at 270 deg or 1.5 PI)
                 const pointerAngle = (3 * Math.PI / 2);
                 let normalizedAngle = (pointerAngle - currentAngle) % (2 * Math.PI);
                 if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
@@ -597,7 +514,6 @@
                     lastPegIndex = currentPegIndex;
                     playTickSound();
                     
-                    // Trigger Pointer visual wiggling tick
                     const pointerEl = document.getElementById('pointer');
                     pointerEl.style.transform = 'rotate(-15deg)';
                     setTimeout(() => {
@@ -610,54 +526,40 @@
             requestAnimationFrame(animateWheel);
         }
 
-        // --- SPIN TRIGGER ---
         function startSpin() {
             if (isSpinning) return;
-
             initAudio();
 
-            // Calculate initial speed based on mode
             let baseSpeed = 0.35;
             if (spinSpeedMode === "slow") baseSpeed = 0.22;
             if (spinSpeedMode === "fast") baseSpeed = 0.55;
 
-            // Random variance for true randomness
             angularVelocity = baseSpeed + Math.random() * 0.15;
             isSpinning = true;
 
             document.getElementById('spinBtn').classList.add('opacity-50', 'pointer-events-none');
         }
 
-        // --- SPIN COMPLETION & RESULT DETERMINATION ---
         function onSpinComplete() {
             document.getElementById('spinBtn').classList.remove('opacity-50', 'pointer-events-none');
 
-            // Pointer angle is top (3 * Math.PI / 2)
             const pointerAngle = (3 * Math.PI / 2);
             let winningAngle = (pointerAngle - currentAngle) % (2 * Math.PI);
             if (winningAngle < 0) winningAngle += 2 * Math.PI;
 
-            // Find sector index
             const winningIndex = Math.floor(winningAngle / arc);
             const winningSector = sectors[winningIndex];
 
-            // Update statistics
             totalSpins++;
             if (winningSector.isCheck) {
                 checkedCount++;
             }
 
-            // Update UI
             updateStatsUI();
-
-            // Save updated stats to cloud
             saveStatsToCloud();
-
-            // Display Modal Result
             showResultModal(winningSector);
         }
 
-        // --- STATS CALCULATIONS ---
         function updateStatsUI() {
             document.getElementById('statTotalSpins').textContent = totalSpins;
             document.getElementById('statCheckedCount').textContent = checkedCount;
@@ -668,7 +570,6 @@
             document.getElementById('statExpPercent').textContent = expPercentStr;
             document.getElementById('statExpBar').style.width = Math.min(100, (expRatio * 100)) + "%";
 
-            // Grade 9 Math Law of Large Numbers simple guidance
             const lawText = document.getElementById('lawOfLargeNumbersText');
             if (totalSpins === 0) {
                 lawText.textContent = "Theoretical probability predicts what should happen mathematically (20%). Experimental probability shows what actually happens during your spins.";
@@ -681,7 +582,6 @@
             }
         }
 
-        // --- RESULT MODAL ---
         function showResultModal(sector) {
             const modal = document.getElementById('resultModal');
             const card = document.getElementById('resultCard');
@@ -692,44 +592,27 @@
             const badge = document.getElementById('modalOutcomeBadge');
 
             if (sector.isCheck) {
-                // Homework Check Result
                 playCheckSound();
-
                 iconContainer.className = "w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 border border-red-200 bg-red-50 text-red-600 shadow-sm";
                 icon.setAttribute('data-lucide', 'alert-triangle');
                 title.textContent = "HOMEWORK CHECK!";
                 title.className = "text-3xl font-extrabold mb-2 text-red-600 tracking-tight";
-                
                 desc.textContent = "Time to get those math notebooks open! Mr. Hinz is checking homework solutions.";
-                
                 badge.textContent = "Homework Check (1 in 5 = 20% Chance)";
                 badge.className = "font-bold text-red-600";
-
             } else {
-                // Safe Result
                 playSafeSound();
-
-                // Trigger Confetti Burst
-                confetti({
-                    particleCount: 50,
-                    spread: 60,
-                    origin: { y: 0.6 }
-                });
-
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
                 iconContainer.className = "w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 border border-emerald-200 bg-emerald-50 text-emerald-600 shadow-sm";
                 icon.setAttribute('data-lucide', 'shield-check');
                 title.textContent = "SAFE!";
                 title.className = "text-3xl font-extrabold mb-2 text-emerald-600 tracking-tight";
-                
                 desc.textContent = "You passed this probability test! No homework check for you on this spin.";
-                
                 badge.textContent = "Safe (4 in 5 = 80% Chance)";
                 badge.className = "font-bold text-emerald-600";
             }
 
             lucide.createIcons();
-
-            // Show animation
             modal.classList.remove('opacity-0', 'pointer-events-none');
             card.classList.remove('scale-90');
             card.classList.add('scale-100');
@@ -738,16 +621,13 @@
         function closeModal() {
             const modal = document.getElementById('resultModal');
             const card = document.getElementById('resultCard');
-
             card.classList.remove('scale-100');
             card.classList.add('scale-90');
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
-        // --- EVENT LISTENERS ---
         document.getElementById('spinBtn').addEventListener('click', startSpin);
 
-        // Keyboard Spacebar listener to spin
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && e.target === document.body) {
                 e.preventDefault();
@@ -755,7 +635,6 @@
             }
         });
 
-        // Speed Mode Selector Buttons
         document.querySelectorAll('.spin-speed-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.spin-speed-btn').forEach(b => {
@@ -766,7 +645,6 @@
             });
         });
 
-        // Sound Toggle Button
         document.getElementById('soundToggleBtn').addEventListener('click', () => {
             soundEnabled = !soundEnabled;
             const icon = document.getElementById('soundIcon');
@@ -784,7 +662,6 @@
             lucide.createIcons();
         });
 
-        // Reset Data Button
         document.getElementById('resetStatsBtn').addEventListener('click', () => {
             totalSpins = 0;
             checkedCount = 0;
@@ -792,13 +669,11 @@
             saveStatsToCloud();
         });
 
-        // Close Result Modal
         document.getElementById('closeModalBtn').addEventListener('click', closeModal);
         document.getElementById('resultModal').addEventListener('click', (e) => {
             if (e.target.id === 'resultModal') closeModal();
         });
 
-        // INITIALIZATION
         window.onload = function() {
             lucide.createIcons();
             updateStatsUI();
