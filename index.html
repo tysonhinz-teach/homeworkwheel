@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-    
-const firebaseConfig = {
-     apiKey: "YOUR_API_KEY",
-     authDomain: "YOUR_PROJECT.firebaseapp.com",
-     projectId: "YOUR_PROJECT_ID",
-     storageBucket: "YOUR_PROJECT.appspot.com",
-     messagingSenderId: "...",
-     appId: "..."
-   };
-   const app = initializeApp(firebaseConfig);
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr. Hinz's Homework Checks</title>
@@ -95,6 +84,12 @@ const firebaseConfig = {
 
             <!-- Header Controls -->
             <div class="flex items-center gap-2">
+                <!-- Cloud Connection Diagnostic Badge -->
+                <div id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold" title="Cloud Sync Status">
+                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span id="cloudStatusText">Local Mode</span>
+                </div>
+
                 <!-- Sound Toggle Button -->
                 <button id="soundToggleBtn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold transition">
                     <i id="soundIcon" data-lucide="volume-2" class="w-4 h-4 text-blue-600"></i>
@@ -260,7 +255,11 @@ const firebaseConfig = {
 
 
     <!-- JAVASCRIPT GAME & INTERACTION LOGIC -->
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         // --- APPLICATION STATE ---
         const sectors = [
             { id: 1, label: "Homework Check!", isCheck: true, color: "#ef4444", textColor: "#ffffff" },
@@ -279,6 +278,126 @@ const firebaseConfig = {
         // Statistics
         let totalSpins = 0;
         let checkedCount = 0;
+
+        // =========================================================================
+        // FIREBASE SETUP FOR GITHUB PAGES:
+        // Paste your Firebase Config object below to save data permanently on GitHub Pages!
+        // =========================================================================
+        const customFirebaseConfig = null; 
+
+        // Cloud Data Persistence Configuration
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hinz-homework-wheel';
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let statsDocRef = null;
+
+        function updateCloudStatus(status, message = '') {
+            const badge = document.getElementById('cloudStatusBadge');
+            const dot = document.getElementById('cloudStatusDot');
+            const text = document.getElementById('cloudStatusText');
+            if (!badge || !dot || !text) return;
+
+            badge.classList.remove('hidden');
+
+            if (status === 'connected') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                text.textContent = "Cloud Saved";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold";
+                badge.title = "Connected to Firebase! Data is automatically saved across all devices.";
+                badge.onclick = null;
+            } else if (status === 'error') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+                text.textContent = "Cloud Error";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200 text-xs font-bold cursor-pointer hover:bg-red-100 transition";
+                badge.title = "Click to see Firebase error details";
+                badge.onclick = () => alert("Firebase Connection Error:\n\n" + (message || "Failed to sync with Firebase. Please check your configuration."));
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                text.textContent = "Local Only";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold";
+                badge.title = "Spins reset on refresh. Paste Firebase config in index.html to enable cross-device persistence.";
+                badge.onclick = null;
+            }
+        }
+
+        async function initCloudStorage() {
+            let firebaseConfig = null;
+            
+            // Priority 1: Custom config defined directly in the file (for GitHub Pages)
+            if (typeof customFirebaseConfig !== 'undefined' && customFirebaseConfig) {
+                firebaseConfig = customFirebaseConfig;
+            } 
+            // Priority 2: Built-in environment config
+            else if (typeof __firebase_config !== 'undefined') {
+                try {
+                    firebaseConfig = JSON.parse(__firebase_config);
+                } catch(e) {}
+            }
+
+            if (!firebaseConfig) {
+                updateCloudStatus('local');
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Authenticate before querying database
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (authErr) {
+                        if (authErr.code === 'auth/operation-not-allowed') {
+                            updateCloudStatus('error', 'Anonymous Auth is turned OFF in Firebase!\n\nFix: Go to Firebase Console -> Authentication -> Sign-in method -> Click "Anonymous" -> Turn ON toggle -> Save.');
+                            return;
+                        } else {
+                            throw authErr;
+                        }
+                    }
+                }
+                currentUser = auth.currentUser;
+
+                if (!currentUser) return;
+
+                // Path rule: /artifacts/{appId}/public/data/{collectionName}
+                statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'spinData');
+
+                // Real-time synchronization
+                onSnapshot(statsDocRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        totalSpins = data.totalSpins || 0;
+                        checkedCount = data.checkedCount || 0;
+                        updateStatsUI();
+                    }
+                    updateCloudStatus('connected');
+                }, (err) => {
+                    console.warn("Cloud sync listener warning:", err);
+                    updateCloudStatus('error', 'Firestore Permission Error!\n\nFix: In Firebase Console -> Firestore Database -> Rules tab, ensure your rules allow read and write access.');
+                });
+            } catch (err) {
+                console.warn("Cloud persistence setup warning:", err);
+                updateCloudStatus('error', err.message || 'Firebase failed to initialize. Make sure you pasted the exact config object.');
+            }
+        }
+
+        async function saveStatsToCloud() {
+            if (!db || !currentUser || !statsDocRef) return;
+            try {
+                await setDoc(statsDocRef, {
+                    totalSpins: totalSpins,
+                    checkedCount: checkedCount,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Error saving spin stats:", err);
+            }
+        }
 
         // Sound Audio Context (Web Audio API)
         let audioCtx = null;
@@ -447,8 +566,8 @@ const firebaseConfig = {
 
         function animateWheel() {
             if (isSpinning) {
-                // Apply friction deceleration
-                angularVelocity *= 0.988;
+                // Apply reduced friction deceleration (0.9912 extends spin duration by ~3 seconds)
+                angularVelocity *= 0.9912;
 
                 // Stop condition
                 if (angularVelocity < 0.001) {
@@ -523,6 +642,9 @@ const firebaseConfig = {
 
             // Update UI
             updateStatsUI();
+
+            // Save updated stats to cloud
+            saveStatsToCloud();
 
             // Display Modal Result
             showResultModal(winningSector);
@@ -660,6 +782,7 @@ const firebaseConfig = {
             totalSpins = 0;
             checkedCount = 0;
             updateStatsUI();
+            saveStatsToCloud();
         });
 
         // Close Result Modal
@@ -672,6 +795,7 @@ const firebaseConfig = {
         window.onload = function() {
             lucide.createIcons();
             updateStatsUI();
+            initCloudStorage();
             requestAnimationFrame(animateWheel);
         };
     </script>
