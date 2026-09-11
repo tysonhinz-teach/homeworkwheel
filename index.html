@@ -1,95 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ms. Chahal's Homework Checks</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Custom Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-    </style>
-</head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center justify-center p-4">
+<!-- JAVASCRIPT GAME & INTERACTION LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <!-- MAIN CARD CONTAINER -->
-    <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 flex flex-col items-center relative">
-        
-        <!-- HEADER -->
-        <div class="text-center mb-6">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                Ms. Chahal's Homework Checks
-            </h1>
-            <p class="text-sm text-slate-500 font-medium mt-1">Spin the wheel to see if today is a homework check!</p>
-        </div>
+        // APP CONFIGURATION
+        const customFirebaseConfig = {
+            apiKey: "AIzaSyDHmL6x6Rg62D8_4yFm59VYKQm_XBk5ifo",
+            authDomain: "wheel-2-b5643.firebaseapp.com",
+            databaseURL: "https://wheel-2-b5643-default-rtdb.firebaseio.com",
+            projectId: "wheel-2-b5643",
+            storageBucket: "wheel-2-b5643.firebasestorage.app",
+            messagingSenderId: "425047161672",
+            appId: "1:425047161672:web:22841d98d442d6a521d17d"
+        };
 
-        <!-- WHEEL & CONTROLS CONTAINER -->
-        <div class="relative w-full flex flex-col items-center">
-            
-            <!-- POINTER / TICKER -->
-            <div id="pointer" class="absolute -top-3 z-10 w-8 h-10 transition-transform duration-75 origin-top flex justify-center">
-                <div class="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[28px] border-t-amber-500 drop-shadow-md"></div>
-            </div>
-
-            <!-- CANVAS WHEEL -->
-            <div class="relative p-2 bg-slate-200/60 rounded-full shadow-inner">
-                <canvas id="wheelCanvas" width="380" height="380" class="max-w-full h-auto rounded-full"></canvas>
-            </div>
-
-            <!-- SPIN BUTTON -->
-            <button id="spinBtn" class="mt-6 w-full max-w-xs py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-lg rounded-2xl shadow-lg shadow-blue-500/25 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                <i data-lucide="rotate-cw" class="w-5 h-5"></i>
-                SPIN THE WHEEL
-            </button>
-
-            <!-- EXTRA CONTROLS (SPEED & SOUND) -->
-            <div class="flex items-center justify-between w-full mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
-                <!-- SPEED MODE TOGGLES -->
-                <div class="flex items-center gap-1">
-                    <span class="font-bold mr-1">Speed:</span>
-                    <button data-speed="slow" class="spin-speed-btn px-2.5 py-1 rounded-lg bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm">Slow</button>
-                    <button data-speed="normal" class="spin-speed-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white font-semibold border border-blue-600 shadow-sm">Normal</button>
-                    <button data-speed="fast" class="spin-speed-btn px-2.5 py-1 rounded-lg bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm">Fast</button>
-                </div>
-
-                <!-- SOUND TOGGLE BUTTON -->
-                <button id="soundToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-slate-700 transition">
-                    <i data-lucide="volume-2" id="soundIcon" class="w-4 h-4 text-blue-600"></i>
-                    <span id="soundText">Sound ON</span>
-                </button>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- RESULT MODAL -->
-    <div id="resultModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="resultCard" class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl transform scale-90 transition-transform duration-300 border border-slate-100">
-            <div id="modalIconContainer" class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4">
-                <i id="modalIcon" class="w-10 h-10"></i>
-            </div>
-            <h2 id="modalTitle" class="text-3xl font-extrabold mb-2 tracking-tight"></h2>
-            <p id="modalDescription" class="text-slate-600 text-sm mb-6 leading-relaxed"></p>
-            <button id="closeModalBtn" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md active:scale-95 transition">
-                Continue
-            </button>
-        </div>
-    </div>
-
-    <!-- WHEEL GAME LOGIC -->
-    <script>
         const sectors = [
             { id: 1, label: "Homework Check!", isCheck: true, color: "#ef4444", textColor: "#ffffff" },
             { id: 2, label: "Safe", isCheck: false, color: "#10b981", textColor: "#ffffff" },
-            { id: 3, label: "Homework Check!", isCheck: true, color: "#ef4444", textColor: "#ffffff" },
-            { id: 4, label: "Safe", isCheck: false, color: "#3b82f6", textColor: "#ffffff" },
-            { id: 5, label: "Safe", isCheck: false, color: "#8b5cf6", textColor: "#ffffff" }
+            { id: 3, label: "Safe", isCheck: false, color: "#3b82f6", textColor: "#ffffff" },
+            { id: 4, label: "Safe", isCheck: false, color: "#8b5cf6", textColor: "#ffffff" },
+            { id: 5, label: "Safe", isCheck: false, color: "#f59e0b", textColor: "#ffffff" }
         ];
 
         let currentAngle = 0;
@@ -98,7 +29,113 @@
         let spinSpeedMode = "normal";
         let soundEnabled = true;
 
-        // AUDIO SYSTEM (Web Audio API)
+        // Load initial values from Browser Storage immediately
+        let totalSpins = parseInt(localStorage.getItem('hinz_totalSpins') || '0', 10);
+        let checkedCount = parseInt(localStorage.getItem('hinz_checkedCount') || '0', 10);
+
+        let db = null;
+        let auth = null;
+        let statsDocRef = null;
+
+        function updateCloudStatus(status, message = '') {
+            const badge = document.getElementById('cloudStatusBadge');
+            const dot = document.getElementById('cloudStatusDot');
+            const text = document.getElementById('cloudStatusText');
+            if (!badge || !dot || !text) return;
+
+            if (status === 'connected') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                text.textContent = "Cloud Sync Active";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold";
+                badge.title = "Connected! Data syncs to Firebase.";
+                badge.onclick = null;
+            } else if (status === 'error') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                text.textContent = "Saved to Browser";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold cursor-pointer";
+                badge.title = "Click to view details";
+                badge.onclick = () => alert("Note on Sync:\n\nSpins are currently saving safely to this browser. Firebase error:\n" + message);
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+                text.textContent = "Saved to Browser";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold";
+                badge.title = "Spins save automatically in this browser.";
+                badge.onclick = null;
+            }
+        }
+
+        async function initCloudStorage() {
+            updateStatsUI(); // Immediately display browser-saved stats
+
+            if (!customFirebaseConfig || !customFirebaseConfig.apiKey) {
+                updateCloudStatus('local');
+                return;
+            }
+
+            try {
+                const app = initializeApp(customFirebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                try {
+                    await signInAnonymously(auth);
+                } catch (authErr) {
+                    updateCloudStatus('error', 'Anonymous Auth disabled in Firebase console.');
+                    return;
+                }
+
+                statsDocRef = doc(db, 'wheel_data', 'hinz_homework_stats');
+
+                // Real-time synchronization with smart merge
+                onSnapshot(statsDocRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        const cloudSpins = data.totalSpins || 0;
+                        const cloudChecked = data.checkedCount || 0;
+
+                        // Keep whichever value is higher so spins are never lost
+                        if (cloudSpins >= totalSpins) {
+                            totalSpins = cloudSpins;
+                            checkedCount = cloudChecked;
+                            localStorage.setItem('hinz_totalSpins', totalSpins);
+                            localStorage.setItem('hinz_checkedCount', checkedCount);
+                            updateStatsUI();
+                        } else {
+                            // Local data is ahead of cloud, push local data to cloud
+                            saveStatsToCloud();
+                        }
+                    } else {
+                        // First time setup in Firestore
+                        saveStatsToCloud();
+                    }
+                    updateCloudStatus('connected');
+                }, (err) => {
+                    updateCloudStatus('error', err.message);
+                });
+            } catch (err) {
+                updateCloudStatus('error', err.message);
+            }
+        }
+
+        async function saveStatsToCloud() {
+            // 1. Always save to local browser storage instantly
+            localStorage.setItem('hinz_totalSpins', totalSpins);
+            localStorage.setItem('hinz_checkedCount', checkedCount);
+
+            // 2. Push to Firestore if connected
+            if (!db || !statsDocRef) return;
+            try {
+                await setDoc(statsDocRef, {
+                    totalSpins: totalSpins,
+                    checkedCount: checkedCount,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (err) {
+                console.warn("Could not save to cloud, saved locally instead:", err);
+            }
+        }
+
+        // --- AUDIO SYSTEM ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) {
@@ -168,7 +205,7 @@
             } catch (e) {}
         }
 
-        // CANVAS WHEEL DRAWING
+        // --- CANVAS WHEEL ---
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const numSectors = sectors.length;
@@ -183,7 +220,6 @@
 
             ctx.clearRect(0, 0, width, height);
 
-            // Outer ring
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius + 8, 0, 2 * Math.PI);
             ctx.fillStyle = '#f1f5f9';
@@ -192,7 +228,6 @@
             ctx.strokeStyle = '#cbd5e1';
             ctx.stroke();
 
-            // Draw sectors
             for (let i = 0; i < numSectors; i++) {
                 const sectorAngle = currentAngle + i * arc;
                 const sector = sectors[i];
@@ -209,7 +244,6 @@
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
 
-                // Sector text
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(sectorAngle + arc / 2);
@@ -218,8 +252,8 @@
                 ctx.fillStyle = sector.textColor;
 
                 if (sector.isCheck) {
-                    ctx.font = "bold 15px 'Plus Jakarta Sans', sans-serif";
-                    ctx.fillText(sector.label, radius - 20, 0);
+                    ctx.font = "bold 16px 'Plus Jakarta Sans', sans-serif";
+                    ctx.fillText("🚨 " + sector.label, radius - 22, 0);
                 } else {
                     ctx.font = "bold 20px 'Plus Jakarta Sans', sans-serif";
                     ctx.fillText("✅ " + sector.label, radius - 30, 0);
@@ -228,7 +262,6 @@
                 ctx.restore();
             }
 
-            // Draw pegs
             for (let i = 0; i < numSectors; i++) {
                 const pegAngle = currentAngle + i * arc;
                 const pegX = centerX + (radius - 4) * Math.cos(pegAngle);
@@ -305,7 +338,36 @@
             const winningIndex = Math.floor(winningAngle / arc);
             const winningSector = sectors[winningIndex];
 
+            totalSpins++;
+            if (winningSector.isCheck) {
+                checkedCount++;
+            }
+
+            updateStatsUI();
+            saveStatsToCloud();
             showResultModal(winningSector);
+        }
+
+        function updateStatsUI() {
+            document.getElementById('statTotalSpins').textContent = totalSpins;
+            document.getElementById('statCheckedCount').textContent = checkedCount;
+
+            const expRatio = totalSpins > 0 ? (checkedCount / totalSpins) : 0;
+            const expPercentStr = (expRatio * 100).toFixed(1) + "% (" + checkedCount + "/" + totalSpins + ")";
+            
+            document.getElementById('statExpPercent').textContent = expPercentStr;
+            document.getElementById('statExpBar').style.width = Math.min(100, (expRatio * 100)) + "%";
+
+            const lawText = document.getElementById('lawOfLargeNumbersText');
+            if (totalSpins === 0) {
+                lawText.textContent = "Theoretical probability predicts what should happen mathematically (20%). Experimental probability shows what actually happens during your spins.";
+            } else if (totalSpins < 10) {
+                lawText.textContent = `Small sample size (${totalSpins} spins). Experimental probability can vary from the theoretical 20%!`;
+            } else if (totalSpins < 25) {
+                lawText.textContent = `Notice how with ${totalSpins} spins, the experimental probability starts getting closer to the theoretical 20%.`;
+            } else {
+                lawText.textContent = `Great dataset (${totalSpins} spins)! As the number of trials increases, experimental probability approaches theoretical probability.`;
+            }
         }
 
         function showResultModal(sector) {
@@ -315,6 +377,7 @@
             const icon = document.getElementById('modalIcon');
             const title = document.getElementById('modalTitle');
             const desc = document.getElementById('modalDescription');
+            const badge = document.getElementById('modalOutcomeBadge');
 
             if (sector.isCheck) {
                 playCheckSound();
@@ -322,7 +385,9 @@
                 icon.setAttribute('data-lucide', 'alert-triangle');
                 title.textContent = "HOMEWORK CHECK!";
                 title.className = "text-3xl font-extrabold mb-2 text-red-600 tracking-tight";
-                desc.textContent = "Time to get those homework notebooks open! Ms. Chahal is checking homework today.";
+                desc.textContent = "Time to get those math notebooks open! Mr. Hinz is checking homework solutions.";
+                badge.textContent = "Homework Check (1 in 5 = 20% Chance)";
+                badge.className = "font-bold text-red-600";
             } else {
                 playSafeSound();
                 confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
@@ -330,7 +395,9 @@
                 icon.setAttribute('data-lucide', 'shield-check');
                 title.textContent = "SAFE!";
                 title.className = "text-3xl font-extrabold mb-2 text-emerald-600 tracking-tight";
-                desc.textContent = "No homework check for today's spin! Enjoy the rest of class.";
+                desc.textContent = "You passed this probability test! No homework check for you on this spin.";
+                badge.textContent = "Safe (4 in 5 = 80% Chance)";
+                badge.className = "font-bold text-emerald-600";
             }
 
             lucide.createIcons();
@@ -347,7 +414,6 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
-        // EVENT LISTENERS
         document.getElementById('spinBtn').addEventListener('click', startSpin);
 
         window.addEventListener('keydown', (e) => {
@@ -360,9 +426,9 @@
         document.querySelectorAll('.spin-speed-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.spin-speed-btn').forEach(b => {
-                    b.className = 'spin-speed-btn px-2.5 py-1 rounded-lg bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm';
+                    b.className = 'spin-speed-btn px-3 py-1 rounded-lg bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm';
                 });
-                e.target.className = 'spin-speed-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white font-semibold border border-blue-600 shadow-sm';
+                e.target.className = 'spin-speed-btn px-3 py-1 rounded-lg bg-blue-600 text-white font-semibold border border-blue-600 shadow-sm';
                 spinSpeedMode = e.target.getAttribute('data-speed');
             });
         });
@@ -384,6 +450,17 @@
             lucide.createIcons();
         });
 
+        document.getElementById('resetStatsBtn').addEventListener('click', () => {
+            if (confirm("Are you sure you want to reset all classroom spin statistics back to zero?")) {
+                totalSpins = 0;
+                checkedCount = 0;
+                localStorage.setItem('hinz_totalSpins', '0');
+                localStorage.setItem('hinz_checkedCount', '0');
+                updateStatsUI();
+                saveStatsToCloud();
+            }
+        });
+
         document.getElementById('closeModalBtn').addEventListener('click', closeModal);
         document.getElementById('resultModal').addEventListener('click', (e) => {
             if (e.target.id === 'resultModal') closeModal();
@@ -391,8 +468,8 @@
 
         window.onload = function() {
             lucide.createIcons();
+            updateStatsUI();
+            initCloudStorage();
             requestAnimationFrame(animateWheel);
         };
     </script>
-</body>
-</html>
