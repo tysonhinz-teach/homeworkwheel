@@ -1,8 +1,230 @@
-<!-- JAVASCRIPT GAME & INTERACTION LOGIC -->
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Hinz's Homework Checks</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        code: ['Fira Code', 'monospace']
+                    },
+                    colors: {
+                        chalkboard: '#f8fafc',
+                        cardBg: '#ffffff'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .whiteboard-bg {
+            background-color: #f1f5f9;
+            background-image: 
+                linear-gradient(to right, rgba(203, 213, 225, 0.4) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(203, 213, 225, 0.4) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .pointer-tick {
+            transform-origin: top center;
+            transition: transform 0.05s ease-out;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="h-full whiteboard-bg text-slate-800 font-sans antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <!-- TOP HEADER -->
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm px-4 py-3 relative z-10">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <div class="p-2.5 bg-blue-50 rounded-xl border border-blue-200 text-blue-600">
+                    <i data-lucide="check-square" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900 flex items-center justify-center sm:justify-start gap-2">
+                        <span>Mr. Hinz's Homework Checks</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">Grade 9 Math</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">
+                        Theoretical Probability: P(Homework Check) = 1 in 5 (20%)
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Status Badge -->
+                <div id="cloudStatusBadge" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold" title="Connecting...">
+                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    <span id="cloudStatusText">Connecting...</span>
+                </div>
+
+                <button id="soundToggleBtn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold transition">
+                    <i id="soundIcon" data-lucide="volume-2" class="w-4 h-4 text-blue-600"></i>
+                    <span id="soundText">Sound ON</span>
+                </button>
+
+                <button id="resetStatsBtn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold transition">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
+                    <span>Reset Data</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <section class="lg:col-span-7 flex flex-col items-center justify-center bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm relative overflow-hidden">
+            <div class="relative my-2 flex items-center justify-center select-none">
+                <div id="pointer" class="absolute -top-5 z-20 pointer-tick filter drop-shadow-md">
+                    <svg width="44" height="52" viewBox="0 0 46 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23 54L3.08333 19.5L42.9167 19.5L23 54Z" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                        <circle cx="23" cy="18" r="14" fill="#dc2626" stroke="#ffffff" stroke-width="3"/>
+                        <path d="M23 10L23 26" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+
+                <div class="p-3 bg-slate-100 rounded-full border border-slate-200 shadow-inner relative">
+                    <canvas id="wheelCanvas" width="440" height="440" class="max-w-full h-auto cursor-pointer rounded-full transition-transform duration-300 hover:scale-[1.01]"></canvas>
+                </div>
+
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full border-4 border-slate-200 shadow-md flex items-center justify-center pointer-events-none z-10">
+                    <i data-lucide="calculator" class="w-7 h-7 text-blue-600"></i>
+                </div>
+            </div>
+
+            <div class="w-full max-w-md mt-6 flex flex-col items-center gap-4 z-10">
+                <button id="spinBtn" class="w-full py-4 px-8 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold text-xl rounded-2xl shadow-lg shadow-blue-500/20 border border-blue-400/30 flex items-center justify-center gap-3 transition-all">
+                    <i data-lucide="rotate-cw" class="w-6 h-6"></i>
+                    <span>SPIN THE WHEEL</span>
+                    <span class="text-xs bg-black/15 px-2 py-1 rounded font-code text-blue-100 hidden sm:inline">Spacebar</span>
+                </button>
+
+                <div class="flex items-center justify-between w-full px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
+                    <span class="font-semibold flex items-center gap-1.5">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> Spin Speed:
+                    </span>
+                    <div class="flex gap-1.5">
+                        <button class="spin-speed-btn px-3 py-1 rounded-lg bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm" data-speed="slow">Gentle</button>
+                        <button class="spin-speed-btn px-3 py-1 rounded-lg bg-blue-600 text-white font-semibold border border-blue-600 shadow-sm" data-speed="normal">Normal</button>
+                        <button class="spin-speed-btn px-3 py-1 rounded-lg bg-white text-slate-700 font-semibold border border-slate-200 shadow-sm" data-speed="fast">Wild</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-5 flex flex-col gap-6">
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+                    <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-600"></i>
+                        <span>Classroom Probability Data</span>
+                    </h2>
+                    <span class="text-[10px] font-code bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">Grade 9 Tracker</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
+                        <span class="text-xs text-slate-500 font-medium block mb-1">Total Spins</span>
+                        <span id="statTotalSpins" class="text-3xl font-extrabold font-code text-slate-900">0</span>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-100 text-center">
+                        <span class="text-xs text-red-600 font-medium block mb-1">Homework Checks</span>
+                        <span id="statCheckedCount" class="text-3xl font-extrabold font-code text-red-600">0</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-xs font-medium mb-5">
+                    <div>
+                        <div class="flex justify-between mb-1.5 text-slate-600">
+                            <span>Theoretical Probability P(Check)</span>
+                            <span class="font-code text-blue-600 font-bold">20.0% (1 in 5)</span>
+                        </div>
+                        <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200 p-0.5">
+                            <div class="h-full bg-blue-500 rounded-full w-[20%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1.5 text-slate-600">
+                            <span>Experimental Probability</span>
+                            <span id="statExpPercent" class="font-code text-amber-600 font-bold">0.0% (0/0)</span>
+                        </div>
+                        <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200 p-0.5">
+                            <div id="statExpBar" class="h-full bg-amber-500 rounded-full w-[0%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-blue-50/70 rounded-2xl border border-blue-100 text-xs text-slate-700 leading-relaxed">
+                    <p class="font-bold text-blue-900 mb-1 flex items-center gap-1.5">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-blue-600"></i>
+                        <span>Theoretical vs. Experimental:</span>
+                    </p>
+                    <p id="lawOfLargeNumbersText">
+                        Theoretical probability predicts what <em>should</em> happen mathematically (20%). Experimental probability shows what <em>actually</em> happens during your spins.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-3 text-center text-xs text-slate-500 font-medium">
+        Mr. Hinz's Math Classroom • Grade 9 Probability Activity
+    </footer>
+
+    <!-- RESULT MODAL OVERLAY -->
+    <div id="resultModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="resultCard" class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl text-center transform scale-90 transition-transform duration-300 relative overflow-hidden">
+            <div id="modalIconContainer" class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 border shadow-sm">
+                <i id="modalIcon" data-lucide="shield-check" class="w-10 h-10"></i>
+            </div>
+            <h3 id="modalTitle" class="text-3xl font-extrabold mb-2 tracking-tight text-slate-900">SAFE!</h3>
+            <p id="modalDescription" class="text-slate-600 text-sm mb-6 leading-relaxed">
+                You passed the spin! No homework check right now.
+            </p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-code text-slate-600 mb-6">
+                Outcome: <span id="modalOutcomeBadge" class="font-bold text-slate-900">Safe (4 in 5 Chance)</span>
+            </div>
+            <button id="closeModalBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition shadow-lg shadow-blue-500/20 text-sm">
+                Continue Lesson
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GAME & INTERACTION LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // APP CONFIGURATION
         const customFirebaseConfig = {
@@ -29,7 +251,7 @@
         let spinSpeedMode = "normal";
         let soundEnabled = true;
 
-        // Load initial values from Browser Storage immediately
+        // Statistics (Local Cache initialized from localStorage)
         let totalSpins = parseInt(localStorage.getItem('hinz_totalSpins') || '0', 10);
         let checkedCount = parseInt(localStorage.getItem('hinz_checkedCount') || '0', 10);
 
@@ -45,28 +267,26 @@
 
             if (status === 'connected') {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                text.textContent = "Cloud Sync Active";
+                text.textContent = "Cloud Saved";
                 badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold";
-                badge.title = "Connected! Data syncs to Firebase.";
+                badge.title = "Connected to Firebase! Data syncs across devices.";
                 badge.onclick = null;
             } else if (status === 'error') {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                text.textContent = "Saved to Browser";
-                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold cursor-pointer";
-                badge.title = "Click to view details";
-                badge.onclick = () => alert("Note on Sync:\n\nSpins are currently saving safely to this browser. Firebase error:\n" + message);
+                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+                text.textContent = "Cloud Error";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200 text-xs font-bold cursor-pointer hover:bg-red-100 transition";
+                badge.title = "Click to view setup issue";
+                badge.onclick = () => alert("Firebase Configuration Error:\n\n" + message);
             } else {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
-                text.textContent = "Saved to Browser";
-                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold";
-                badge.title = "Spins save automatically in this browser.";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                text.textContent = "Saved Locally";
+                badge.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold";
+                badge.title = "Data saved in browser storage.";
                 badge.onclick = null;
             }
         }
 
         async function initCloudStorage() {
-            updateStatsUI(); // Immediately display browser-saved stats
-
             if (!customFirebaseConfig || !customFirebaseConfig.apiKey) {
                 updateCloudStatus('local');
                 return;
@@ -80,49 +300,41 @@
                 try {
                     await signInAnonymously(auth);
                 } catch (authErr) {
-                    updateCloudStatus('error', 'Anonymous Auth disabled in Firebase console.');
-                    return;
+                    if (authErr.code === 'auth/configuration-not-found' || authErr.code === 'auth/operation-not-allowed') {
+                        updateCloudStatus('error', 'Anonymous Auth is OFF in Firebase console wheel-2-b5643!\n\nFix: Go to Firebase Console -> Authentication -> Sign-in method -> Click "Anonymous" -> Turn ON -> Save.');
+                        return;
+                    }
+                    throw authErr;
                 }
 
                 statsDocRef = doc(db, 'wheel_data', 'hinz_homework_stats');
 
-                // Real-time synchronization with smart merge
                 onSnapshot(statsDocRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.data();
-                        const cloudSpins = data.totalSpins || 0;
-                        const cloudChecked = data.checkedCount || 0;
-
-                        // Keep whichever value is higher so spins are never lost
-                        if (cloudSpins >= totalSpins) {
-                            totalSpins = cloudSpins;
-                            checkedCount = cloudChecked;
-                            localStorage.setItem('hinz_totalSpins', totalSpins);
-                            localStorage.setItem('hinz_checkedCount', checkedCount);
-                            updateStatsUI();
-                        } else {
-                            // Local data is ahead of cloud, push local data to cloud
-                            saveStatsToCloud();
-                        }
+                        totalSpins = data.totalSpins || 0;
+                        checkedCount = data.checkedCount || 0;
+                        localStorage.setItem('hinz_totalSpins', totalSpins);
+                        localStorage.setItem('hinz_checkedCount', checkedCount);
+                        updateStatsUI();
                     } else {
-                        // First time setup in Firestore
                         saveStatsToCloud();
                     }
                     updateCloudStatus('connected');
                 }, (err) => {
-                    updateCloudStatus('error', err.message);
+                    console.warn("Firestore snapshot listener error:", err);
+                    updateCloudStatus('error', 'Firestore permission error!\n\nFix: In Firebase Console -> Firestore Database -> Rules tab, change rules to allow read/write.');
                 });
             } catch (err) {
-                updateCloudStatus('error', err.message);
+                console.warn("Cloud initialization error:", err);
+                updateCloudStatus('error', err.message || 'Firebase failed to connect.');
             }
         }
 
         async function saveStatsToCloud() {
-            // 1. Always save to local browser storage instantly
             localStorage.setItem('hinz_totalSpins', totalSpins);
             localStorage.setItem('hinz_checkedCount', checkedCount);
 
-            // 2. Push to Firestore if connected
             if (!db || !statsDocRef) return;
             try {
                 await setDoc(statsDocRef, {
@@ -131,11 +343,11 @@
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
             } catch (err) {
-                console.warn("Could not save to cloud, saved locally instead:", err);
+                console.error("Error saving data to Firebase:", err);
             }
         }
 
-        // --- AUDIO SYSTEM ---
+        // Web Audio API Tones
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) {
@@ -205,7 +417,7 @@
             } catch (e) {}
         }
 
-        // --- CANVAS WHEEL ---
+        // Canvas Wheel Drawing
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const numSectors = sectors.length;
@@ -451,14 +663,10 @@
         });
 
         document.getElementById('resetStatsBtn').addEventListener('click', () => {
-            if (confirm("Are you sure you want to reset all classroom spin statistics back to zero?")) {
-                totalSpins = 0;
-                checkedCount = 0;
-                localStorage.setItem('hinz_totalSpins', '0');
-                localStorage.setItem('hinz_checkedCount', '0');
-                updateStatsUI();
-                saveStatsToCloud();
-            }
+            totalSpins = 0;
+            checkedCount = 0;
+            updateStatsUI();
+            saveStatsToCloud();
         });
 
         document.getElementById('closeModalBtn').addEventListener('click', closeModal);
@@ -473,3 +681,5 @@
             requestAnimationFrame(animateWheel);
         };
     </script>
+</body>
+</html>
