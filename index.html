@@ -626,7 +626,9 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
+        // EVENT LISTENERS
         document.getElementById('spinBtn').addEventListener('click', startSpin);
+        canvas.addEventListener('click', startSpin);
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && e.target === document.body) {
@@ -645,41 +647,41 @@
             });
         });
 
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('resultModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('resultModal')) closeModal();
+        });
+
         document.getElementById('soundToggleBtn').addEventListener('click', () => {
             soundEnabled = !soundEnabled;
             const icon = document.getElementById('soundIcon');
             const text = document.getElementById('soundText');
-
             if (soundEnabled) {
                 icon.setAttribute('data-lucide', 'volume-2');
-                icon.className = 'w-4 h-4 text-blue-600';
                 text.textContent = 'Sound ON';
             } else {
                 icon.setAttribute('data-lucide', 'volume-x');
-                icon.className = 'w-4 h-4 text-slate-400';
-                text.textContent = 'Muted';
+                text.textContent = 'Sound OFF';
             }
             lucide.createIcons();
         });
 
         document.getElementById('resetStatsBtn').addEventListener('click', () => {
-            totalSpins = 0;
-            checkedCount = 0;
-            updateStatsUI();
-            saveStatsToCloud();
+            if (confirm("Are you sure you want to reset all classroom spin data?")) {
+                totalSpins = 0;
+                checkedCount = 0;
+                localStorage.setItem('hinz_totalSpins', '0');
+                localStorage.setItem('hinz_checkedCount', '0');
+                saveStatsToCloud();
+                updateStatsUI();
+            }
         });
 
-        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-        document.getElementById('resultModal').addEventListener('click', (e) => {
-            if (e.target.id === 'resultModal') closeModal();
-        });
-
-        window.onload = function() {
-            lucide.createIcons();
-            updateStatsUI();
-            initCloudStorage();
-            requestAnimationFrame(animateWheel);
-        };
+        // INITIALIZATION
+        lucide.createIcons();
+        updateStatsUI();
+        initCloudStorage();
+        requestAnimationFrame(animateWheel);
     </script>
 </body>
 </html>
