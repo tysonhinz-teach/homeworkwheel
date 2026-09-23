@@ -73,7 +73,7 @@
                         <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">Grade 9 Math</span>
                     </h1>
                     <p class="text-xs text-slate-500 font-medium">
-                        Theoretical Probability: P(Homework Check) = 1 in 5 (20%)
+                        Theoretical Probability: P(Homework Check) = 2 in 5 (40%)
                     </p>
                 </div>
             </div>
@@ -165,10 +165,10 @@
                     <div>
                         <div class="flex justify-between mb-1.5 text-slate-600">
                             <span>Theoretical Probability P(Check)</span>
-                            <span class="font-code text-blue-600 font-bold">20.0% (1 in 5)</span>
+                            <span class="font-code text-blue-600 font-bold">40.0% (2 in 5)</span>
                         </div>
                         <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200 p-0.5">
-                            <div class="h-full bg-blue-500 rounded-full w-[20%] transition-all duration-500"></div>
+                            <div class="h-full bg-blue-500 rounded-full w-[40%] transition-all duration-500"></div>
                         </div>
                     </div>
 
@@ -189,7 +189,7 @@
                         <span>Theoretical vs. Experimental:</span>
                     </p>
                     <p id="lawOfLargeNumbersText">
-                        Theoretical probability predicts what <em>should</em> happen mathematically (20%). Experimental probability shows what <em>actually</em> happens during your spins.
+                        Theoretical probability predicts what <em>should</em> happen mathematically (40%). Experimental probability shows what <em>actually</em> happens during your spins.
                     </p>
                 </div>
             </div>
@@ -212,7 +212,7 @@
                 You passed the spin! No homework check right now.
             </p>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-code text-slate-600 mb-6">
-                Outcome: <span id="modalOutcomeBadge" class="font-bold text-slate-900">Safe (4 in 5 Chance)</span>
+                Outcome: <span id="modalOutcomeBadge" class="font-bold text-slate-900">Safe (3 in 5 Chance)</span>
             </div>
             <button id="closeModalBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition shadow-lg shadow-blue-500/20 text-sm">
                 Continue Lesson
@@ -237,12 +237,13 @@
             appId: "1:425047161672:web:22841d98d442d6a521d17d"
         };
 
+        // 2 out of 5 sectors are now Homework Checks (40% probability)
         const sectors = [
             { id: 1, label: "Homework Check!", isCheck: true, color: "#ef4444", textColor: "#ffffff" },
             { id: 2, label: "Safe", isCheck: false, color: "#10b981", textColor: "#ffffff" },
-            { id: 3, label: "Safe", isCheck: false, color: "#3b82f6", textColor: "#ffffff" },
-            { id: 4, label: "Safe", isCheck: false, color: "#8b5cf6", textColor: "#ffffff" },
-            { id: 5, label: "Safe", isCheck: false, color: "#f59e0b", textColor: "#ffffff" }
+            { id: 3, label: "Homework Check!", isCheck: true, color: "#f43f5e", textColor: "#ffffff" },
+            { id: 4, label: "Safe", isCheck: false, color: "#3b82f6", textColor: "#ffffff" },
+            { id: 5, label: "Safe", isCheck: false, color: "#8b5cf6", textColor: "#ffffff" }
         ];
 
         let currentAngle = 0;
@@ -572,11 +573,11 @@
 
             const lawText = document.getElementById('lawOfLargeNumbersText');
             if (totalSpins === 0) {
-                lawText.textContent = "Theoretical probability predicts what should happen mathematically (20%). Experimental probability shows what actually happens during your spins.";
+                lawText.textContent = "Theoretical probability predicts what should happen mathematically (40%). Experimental probability shows what actually happens during your spins.";
             } else if (totalSpins < 10) {
-                lawText.textContent = `Small sample size (${totalSpins} spins). Experimental probability can vary from the theoretical 20%!`;
+                lawText.textContent = `Small sample size (${totalSpins} spins). Experimental probability can vary from the theoretical 40%!`;
             } else if (totalSpins < 25) {
-                lawText.textContent = `Notice how with ${totalSpins} spins, the experimental probability starts getting closer to the theoretical 20%.`;
+                lawText.textContent = `Notice how with ${totalSpins} spins, the experimental probability starts getting closer to the theoretical 40%.`;
             } else {
                 lawText.textContent = `Great dataset (${totalSpins} spins)! As the number of trials increases, experimental probability approaches theoretical probability.`;
             }
@@ -598,7 +599,7 @@
                 title.textContent = "HOMEWORK CHECK!";
                 title.className = "text-3xl font-extrabold mb-2 text-red-600 tracking-tight";
                 desc.textContent = "Time to get those math notebooks open! Mr. Hinz is checking homework solutions.";
-                badge.textContent = "Homework Check (1 in 5 = 20% Chance)";
+                badge.textContent = "Homework Check (2 in 5 = 40% Chance)";
                 badge.className = "font-bold text-red-600";
             } else {
                 playSafeSound();
@@ -608,7 +609,7 @@
                 title.textContent = "SAFE!";
                 title.className = "text-3xl font-extrabold mb-2 text-emerald-600 tracking-tight";
                 desc.textContent = "You passed this probability test! No homework check for you on this spin.";
-                badge.textContent = "Safe (4 in 5 = 80% Chance)";
+                badge.textContent = "Safe (3 in 5 = 60% Chance)";
                 badge.className = "font-bold text-emerald-600";
             }
 
